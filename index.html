@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<meta charset="utf-8">
+<style type="text/css">
+  
+body,html{
+  width:100%;
+  margin:0;
+  padding:0;
+  border:0;
+}
+
+svg{
+    border:1px solid black;
+}
+
+circle.outer{
+    fill:transparent;
+    stroke:black;
+}
+
+circle.inner{
+    stroke:transparent;
+    fill:black;
+}
+
+</style>
+<div id="svg">
+  <svg width="500" height="500"></svg>
+</div>
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<script type="text/javascript">
+
+
+var balls = [{x:0,y:0,vx:(Math.random()-0.5)*5,vy:(Math.random()-0.5)*5}];
+
+function cartesianToPolar(x, y) {
+    var returnFloat = [0.0 , 0.0];
+    returnFloat[0] = Math.atan2( y , x );
+    returnFloat[1] = Math.sqrt( x * x + y * y );
+    return returnFloat;
+}
+
+var r = 250, r2 = Math.pow(r,2);
+
+var svg = d3.select('svg');
+
+    svg.append('circle')
+        .attr('class','outer')
+        .attr('r', r)
+        .attr('cx',r)
+        .attr('cy',r);
+
+var c = svg.append('g').selectAll('circle').data(balls).enter().append('circle').attr('r',3).attr('class','inner');
+
+function update(){
+
+    balls.forEach(function(p){
+        var lastX = p.x;
+        var lastY = p.y;
+            
+        p.x += p.vx;
+        p.y += p.vy;
+            
+        //boundary
+        var radSquare= Math.sqrt(p.x*p.x + p.y*p.y);
+        if (radSquare > r) {
+                
+            //find intersection point with circle. simple method: midpoint
+            var exitX = (lastX + p.x)/2;
+            var exitY = (lastY + p.y)/2;
+                
+            //scale to proper radius
+            var exitRad = Math.sqrt(exitX*exitX + exitY*exitY);
+            exitX *= r/exitRad;
+            exitY *= r/exitRad;
+                
+            p.x = exitX;
+            p.y = exitY;
+
+            //bounce
+            var twiceProjFactor = 2*(exitX*p.vx + exitY*p.vy)/r2;
+            var vx = p.vx - twiceProjFactor*exitX;
+            var vy = p.vy - twiceProjFactor*exitY;
+            p.vx = vx;
+            p.vx = vy;
+
+        }
+    });
+
+    c.data(balls)
+        .attr('cx', function(d){ return d.x+r; })
+        .attr('cy', function(d){ return d.y+r; });
+}
+
+var start = null;
+
+function step() {
+    update();
+    window.requestAnimationFrame(step);
+}
+
+window.requestAnimationFrame(step);
+
+</script>
