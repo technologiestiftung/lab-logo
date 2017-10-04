@@ -14,33 +14,44 @@
 	}
 
 	.edge{
-		stroke-width:8px;
+		stroke-width:6px;
 		stroke-linejoin:round;
 		stroke-linecap: round;
-		stroke:#2E91D1;
-		opacity: 0.8;
+		stroke:#6ECDF5;
+		opacity: 1;
 	}
 
 	.hedge{
-		stroke-width:8px;
+		stroke-width:6px;
 		stroke-linejoin:round;
 		stroke-linecap: round;
 		stroke:#E60433;
-		opacity: 0.8;
+		opacity: 1;
 	}
 
 	path, circle, .outer{
 		display: none;
 	}
+
+	#logo{
+		margin:200px 0 0 200px;
+		float:left;
+	}
+
+	#logo-text{
+		margin:250px 0 0 50px;
+		float:left;
+	}
 </style>
 </head>
 <body>
+	<div id="logo"></div><div id="logo-text"><img src="assets/Logo-Text@2x.png" alt="" /></div>
 <script src="./libs/d3.min.js"></script>
 <script type="text/javascript">
 
-var boundaryRad = 250, boundaryRadSquare = boundaryRad*boundaryRad;
+var boundaryRad = 100, boundaryRadSquare = boundaryRad*boundaryRad, padding = 20;
 
-var svg = d3.select('body').append('svg').attr('width',500).attr('height',500).append('g').attr('transform','translate('+boundaryRad+','+boundaryRad+')');
+var svg = d3.select('#logo').append('svg').attr('width',(boundaryRad+padding)*2).attr('height',(boundaryRad+padding)*2).append('g').attr('transform','translate('+(boundaryRad+padding)+','+(boundaryRad+padding)+')');
 
 svg.append('circle').attr('r',boundaryRad).attr('class','outer');
 
@@ -49,16 +60,20 @@ function randVelo(){
 	if(Math.random()>0.5){
 		base *= -1;
 	}
-	return base * 5;
+	return base * 1;
+}
+
+function resize(n){
+	return n/250*boundaryRad;
 }
 
 var points = [
-	{x:-236,y:33,velX:randVelo(),velY:randVelo(),hist:[]},
-	{x:-195,y:154,velX:randVelo(),velY:randVelo(),hist:[]},
-	{x:145,y:-200,velX:randVelo(),velY:randVelo(),hist:[]},
-	{x:199,y:104,velX:randVelo(),velY:randVelo(),hist:[]},
-	{x:244,y:7,velX:randVelo(),velY:randVelo(),hist:[]},
-	{x:-142,y:-163,velX:randVelo(),velY:randVelo(),hist:[]}
+	{x:resize(-236),y:resize(33),velX:randVelo(),velY:randVelo(),hist:[]},
+	{x:resize(-195),y:resize(154),velX:randVelo(),velY:randVelo(),hist:[]},
+	{x:resize(145),y:resize(-200),velX:randVelo(),velY:randVelo(),hist:[]},
+	{x:resize(199),y:resize(104),velX:randVelo(),velY:randVelo(),hist:[]},
+	{x:resize(244),y:resize(7),velX:randVelo(),velY:randVelo(),hist:[]},
+	{x:resize(-142),y:resize(-163),velX:randVelo(),velY:randVelo(),hist:[]}
 ];
 
 /*for(var i = 0; i<50; i++){
