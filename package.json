@@ -1,0 +1,17 @@
+{
+  "name": "logo",
+  "version": "1.0.0",
+  "description": "tsb lab logo",
+  "main": "index.js",
+  "scripts": {
+    "build": "uglifyjs index.js -o index.min.js -c -m && node-sass style.scss style.css -q --output-style compressed",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Sebastian Meier @seb_meier",
+  "license": "GPL-3.0",
+  "dependencies": {},
+  "devDependencies": {
+    "node-sass": "^4.5.3",
+    "uglify-js": "^3.1.3"
+  }
+}
