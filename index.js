@@ -7,14 +7,16 @@
  * @param _delay (integer) - delay of the uper logo lines from the lines below
  * @param _fill (boolean) - show fills
  * @param _stroke (boolean) - show lines
+ * @param _speed (object) - speed of lines {min:0.3, max:2}
  *
  */
 
-var logo = (function(_container, _radius, _padding, _delay, _fill, _stroke){
+var logo = (function(_container, _radius, _padding, _delay, _fill, _stroke, _speed){
 	var module = {},
 		delay = _delay,
 		fill = _fill,
 		stroke = _stroke,
+		speed = _speed,
 		boundaryRad = _radius,
 		boundaryRadSquare = boundaryRad*boundaryRad,
 		padding = _padding,
@@ -26,7 +28,7 @@ var logo = (function(_container, _radius, _padding, _delay, _fill, _stroke){
 				.attr('transform','translate('+(boundaryRad+padding)+','+(boundaryRad+padding)+')');
 
 	function randVelo(){
-		var base = 1 + Math.random();
+		var base = speed.max/2 + Math.random()*speed.max;
 		if(Math.random()>0.5){
 			base *= -1;
 		}
@@ -83,7 +85,7 @@ var logo = (function(_container, _radius, _padding, _delay, _fill, _stroke){
 		.attr('class','hedge')
 		.style('stroke',function(d){ return (stroke)?'':'transparent'; });
 
-	var velocity = d3.scaleLinear().domain([0,1]).range([2,0.3]);
+	var velocity = d3.scaleLinear().domain([0,1]).range([speed.max,speed.min]);
 
 	function step() {
 
