@@ -21,6 +21,10 @@ var logo = (function(_container, _radius, _padding, _delay, _fill, _stroke, _spe
 		boundaryRadSquare = boundaryRad*boundaryRad,
 		padding = _padding,
 		wh = (boundaryRad+padding)*2,
+		fps = 24,
+		then = Date.now(),
+    	startTime = then,
+		fpsInterval = 1000 / fps,
 		svg = _container.append('svg')
 			.attr('id','tsb-ani-logo')
 			.attr('width',wh)
@@ -91,71 +95,79 @@ var logo = (function(_container, _radius, _padding, _delay, _fill, _stroke, _spe
 	var velocity = d3.scaleLinear().domain([0,1]).range([speed.max,speed.min]);
 
 	function step() {
+		window.requestAnimationFrame(step);
 
-		points.forEach(function(p){
+		now = Date.now();
+    	elapsed = now - then;
 
-			var radSquare= p.x*p.x + p.y*p.y;
+    	if (elapsed > fpsInterval) {
 
-			//update
-			var lastX = p.x;
-			var lastY = p.y;
+			points.forEach(function(p){
 
-			p.x += p.velX*velocity(radSquare/boundaryRadSquare);
-			p.y += p.velY*velocity(radSquare/boundaryRadSquare);
+				var radSquare= p.x*p.x + p.y*p.y;
 
-			p.hist.push({x:p.x,y:p.y});
-			if(p.hist.length > delay){
-				p.hist.splice(0,1);
-			}
-			
-			//boundary
-			if (radSquare > boundaryRadSquare) {
+				//update
+				var lastX = p.x;
+				var lastY = p.y;
+
+				p.x += p.velX*velocity(radSquare/boundaryRadSquare);
+				p.y += p.velY*velocity(radSquare/boundaryRadSquare);
+
+				p.hist.push({x:p.x,y:p.y});
+				if(p.hist.length > delay){
+					p.hist.splice(0,1);
+				}
 				
-				//find intersection point with circle. simple method: midpoint
-				var exitX = (lastX + p.x)/2;
-				var exitY = (lastY + p.y)/2;
+				//boundary
+				if (radSquare > boundaryRadSquare) {
+					
+					//find intersection point with circle. simple method: midpoint
+					var exitX = (lastX + p.x)/2;
+					var exitY = (lastY + p.y)/2;
+					
+					//scale to proper radius
+					var exitRad = Math.sqrt(exitX*exitX + exitY*exitY);
+					exitX *= boundaryRad/exitRad;
+					exitY *= boundaryRad/exitRad;
+					
+					p.x = exitX;
+					p.y = exitY;
+
+					//bounce
+					var twiceProjFactor = 2*(exitX*p.velX + exitY*p.velY)/boundaryRadSquare;
+					var vx = p.velX - twiceProjFactor*exitX;
+					var vy = p.velY - twiceProjFactor*exitY;
+					p.velX = vx;
+					p.velY = vy;
+				}
 				
-				//scale to proper radius
-				var exitRad = Math.sqrt(exitX*exitX + exitY*exitY);
-				exitX *= boundaryRad/exitRad;
-				exitY *= boundaryRad/exitRad;
-				
-				p.x = exitX;
-				p.y = exitY;
-
-				//bounce
-				var twiceProjFactor = 2*(exitX*p.velX + exitY*p.velY)/boundaryRadSquare;
-				var vx = p.velX - twiceProjFactor*exitX;
-				var vy = p.velY - twiceProjFactor*exitY;
-				p.velX = vx;
-				p.velY = vy;
-			}
-			
-		});
-
-		lines
-			.attr('x1',function(d){ return points[d[0]].x; })
-			.attr('x2',function(d){ return points[d[1]].x; })
-			.attr('y1',function(d){ return points[d[0]].y; })
-			.attr('y2',function(d){ return points[d[1]].y; });
-
-		histLines
-			.attr('x1',function(d){ return points[d[0]].hist[0].x; })
-			.attr('x2',function(d){ return points[d[1]].hist[0].x; })
-			.attr('y1',function(d){ return points[d[0]].hist[0].y; })
-			.attr('y2',function(d){ return points[d[1]].hist[0].y; });
-
-		paths
-			.attr('d', function(d){
-				var str = '';
-				d.nodes.forEach(function(p, pi){
-					if(pi===0){ str += 'M'; }else{ str += 'L'; }
-					str += points[p].x + ' ' + points[p].y;
-				});
-				return str+'Z';
 			});
 
-		window.requestAnimationFrame(step);
+			lines
+				.attr('x1',function(d){ return points[d[0]].x; })
+				.attr('x2',function(d){ return points[d[1]].x; })
+				.attr('y1',function(d){ return points[d[0]].y; })
+				.attr('y2',function(d){ return points[d[1]].y; });
+
+			histLines
+				.attr('x1',function(d){ return points[d[0]].hist[0].x; })
+				.attr('x2',function(d){ return points[d[1]].hist[0].x; })
+				.attr('y1',function(d){ return points[d[0]].hist[0].y; })
+				.attr('y2',function(d){ return points[d[1]].hist[0].y; });
+
+			paths
+				.attr('d', function(d){
+					var str = '';
+					d.nodes.forEach(function(p, pi){
+						if(pi===0){ str += 'M'; }else{ str += 'L'; }
+						str += points[p].x + ' ' + points[p].y;
+					});
+					return str+'Z';
+				});
+
+			then = now - (elapsed % fpsInterval);
+		
+		}
 	}
 
 	window.requestAnimationFrame(step);
