@@ -20,10 +20,13 @@ var logo = (function(_container, _radius, _padding, _delay, _fill, _stroke, _spe
 		boundaryRad = _radius,
 		boundaryRadSquare = boundaryRad*boundaryRad,
 		padding = _padding,
+		wh = (boundaryRad+padding)*2,
 		svg = _container.append('svg')
 			.attr('id','tsb-ani-logo')
-			.attr('width',(boundaryRad+padding)*2)
-			.attr('height',(boundaryRad+padding)*2)
+			.attr('width',wh)
+			.attr('height',wh)
+			.attr("viewBox", "0 0 "+wh+" "+wh)
+          	.attr("preserveAspectRatio", "xMinYMin meet")
 			.append('g')
 				.attr('transform','translate('+(boundaryRad+padding)+','+(boundaryRad+padding)+')');
 
